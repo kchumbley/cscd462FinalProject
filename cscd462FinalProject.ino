@@ -1,7 +1,7 @@
 #include <BallyLib.h>
 
 Bally bally;
-
+#define TESTPIN 3
 //Lamps
 //#define GAME_OVER_LAMP_ROW 12
 //#define GAME_OVER_LAMP_COL 2
@@ -111,13 +111,13 @@ Bally bally;
 //2 Chime 10000
 //10 Knocker
 #define OUT_HOLE_KICK 6
-//14 Bottom Left Thumper Bumper
-//1 Top Left Thumper Bumper
-//9 Top Right Thumper Bumper
-//5 Bottom Right Thumper Bumper
-//13 Left Slingshot
+#define BOTTOM_LEFT_POP_BUMPER 14
+#define TOP_LEFT_POP_BUMPER 1
+#define TOP_RIGHT_POP_BUMPER 9
+#define BOTTOM_RIGHT_POP_BUMPER 5
+#define LEFT_SLINGSHOT 13
 #define LEFT_DROP_TARGET_RESET 3
-//11 Right Slingshot
+#define RIGHT_SLINGSHOT 11
 #define RIGHT_DROP_TARGET_RESET 7
 
 //continuous solenoids
@@ -204,34 +204,44 @@ bool enableFlipper() {
     return bally.setContSolenoid(FLIPPER_DISABLE, false);
 }
 
+bool ballInPlay = false;
+
 bool getOutHole() {
-    return bally.getRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
+    bool res = bally.getRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
+    if (res) {
+        ballInPlay = false;
+    }
+    return res;
 }
 
 bool getTopCenterKickOut() {
-    return bally.getRedge(TOP_CENTER_KICK_OUT_ROW, TOP_CENTER_KICK_OUT_COL);
+    bool res = bally.getRedge(TOP_CENTER_KICK_OUT_ROW, TOP_CENTER_KICK_OUT_COL);
+    if (res) {
+        bally.fireSolenoid(SAUCER_KICK_OUT, false);
+    }
+    return res;
 }
 
 int rightDropTarget[4][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BOTTOM_COL},
-                             {RIGHT_DROP_TARGET_C_ROW,RIGHT_DROP_TARGET_C_COL},
-                             {RIGHT_DROP_TARGET_B_ROW,RIGHT_DROP_TARGET_B_COL}, 
-                             {RIGHT_DROP_TARGET_A_TOP_ROW, RIGHT_DROP_TARGET_A_TOP_COL}};
+                             {RIGHT_DROP_TARGET_C_ROW,        RIGHT_DROP_TARGET_C_COL},
+                             {RIGHT_DROP_TARGET_B_ROW,        RIGHT_DROP_TARGET_B_COL},
+                             {RIGHT_DROP_TARGET_A_TOP_ROW,    RIGHT_DROP_TARGET_A_TOP_COL}};
 
 bool getRightDropTarget() {
     bool res = false;
-    for(int  i = 0; i< 4; i++)
+    for (int i = 0; i < 4; i++)
         res |= bally.getRedge(rightDropTarget[i][0], rightDropTarget[i][1]);
     return res;
 }
 
 int leftDropTarget[4][2] = {{LEFT_DROP_TARGET_D_BOTTOM_ROW, LEFT_DROP_TARGET_D_BOTTOM_COL},
-                             {LEFT_DROP_TARGET_C_ROW,LEFT_DROP_TARGET_C_COL},
-                             {LEFT_DROP_TARGET_B_ROW,LEFT_DROP_TARGET_B_COL},
-                             {LEFT_DROP_TARGET_A_TOP_ROW, LEFT_DROP_TARGET_A_TOP_COL}};
+                            {LEFT_DROP_TARGET_C_ROW,        LEFT_DROP_TARGET_C_COL},
+                            {LEFT_DROP_TARGET_B_ROW,        LEFT_DROP_TARGET_B_COL},
+                            {LEFT_DROP_TARGET_A_TOP_ROW,    LEFT_DROP_TARGET_A_TOP_COL}};
 
 bool getLeftDropTarget() {
     bool res = false;
-    for(int  i = 0; i< 4; i++)
+    for (int i = 0; i < 4; i++)
         res |= bally.getRedge(leftDropTarget[i][0], leftDropTarget[i][1]);
     return res;
 }
@@ -260,6 +270,62 @@ bool getTopALane() {
     return bally.getRedge(TOP_A_LANE_ROW, TOP_A_LANE_COL);
 }
 
+bool getRightOutLane() {
+    return bally.getRedge(RIGHT_OUT_LANE_ROW, RIGHT_OUT_LANE_COL);
+}
+
+bool getLeftOutLane() {
+    return bally.getRedge(LEFT_OUT_LANE_ROW, LEFT_OUT_LANE_COL);
+}
+
+bool getRightSlingshot() {
+    bool res = bally.getRedge(RIGHT_SLINGSHOT_ROW, RIGHT_SLINGSHOT_COL);
+    if (res) {
+        bally.fireSolenoid(RIGHT_SLINGSHOT, false);
+    }
+    return res;
+}
+
+bool getLeftSlingshot() {
+    bool res = bally.getRedge(LEFT_SLINGSHOT_ROW, LEFT_SLINGSHOT_COL);
+    if (res) {
+        bally.fireSolenoid(LEFT_SLINGSHOT, false);
+    }
+    return res;
+}
+
+bool getBottomRightPopBumper() {
+    bool res = bally.getRedge(BOTTOM_RIGHT_POP_BUMPER_ROW, BOTTOM_RIGHT_POP_BUMPER_COL);
+    if (res) {
+        bally.fireSolenoid(BOTTOM_RIGHT_POP_BUMPER, false);
+    }
+    return res;
+}
+
+bool getBottomLeftPopBumper() {
+    bool res = bally.getRedge(BOTTOM_LEFT_POP_BUMPER_ROW, BOTTOM_LEFT_POP_BUMPER_COL);
+    if (res) {
+        bally.fireSolenoid(BOTTOM_LEFT_POP_BUMPER, false);
+    }
+    return res;
+}
+
+bool getTopRightPopBumper() {
+    bool res = bally.getRedge(TOP_RIGHT_POP_BUMPER_ROW, TOP_RIGHT_POP_BUMPER_COL);
+    if (res) {
+        bally.fireSolenoid(TOP_RIGHT_POP_BUMPER, false);
+    }
+    return res;
+}
+
+bool getTopLeftPopBumper() {
+    bool res = bally.getRedge(TOP_LEFT_POP_BUMPER_ROW, TOP_LEFT_POP_BUMPER_COL);
+    if (res) {
+        bally.fireSolenoid(TOP_LEFT_POP_BUMPER, false);
+    }
+    return res;
+}
+
 /*
 void parseDisplay(int dispID, unsigned long score ){
     for(int digit = 0; digit < 7; digit++){
@@ -272,7 +338,7 @@ void parseDisplay(int dispID, unsigned long score ){
 
 void displayScores(unsigned long num[]) {
     unsigned long playerScore[] = {num[0], num[1], num[2], num[3], num[4]};
-    for (int display_index = 0; display_index < N_DISPLAYS; display_index++) {  //for each display
+    for (int display_index = 0; display_index < N_DISPLAYS - 1; display_index++) {  //for each display
         for (int digit_index = 0; digit_index < N_DIGITS; digit_index++) {  //for each digit
             int digDecVal = (int) (playerScore[display_index] % 10); //stores the lowest digit
             unsigned char digByte = (unsigned char) digDecVal; //casts to unsigned char
@@ -284,6 +350,20 @@ void displayScores(unsigned long num[]) {
             } else { //if all digits in score have been processed
                 bally.setDisplay(display_index, digit_index, 15); //writes 15 in binary, so no leading zeros displayed
             }
+        }
+    }
+}
+
+void creditBallDisplay(int ballNum, int credits) {
+    for (int digit = 0; digit < 7; digit++) {
+        if (digit == 0) {
+            bally.setDisplay(4, digit, (unsigned char) ballNum);
+        } else if (digit == 3) {
+            bally.setDisplay(4, digit, (unsigned char) (credits % 10));
+        } else if (digit == 4) {
+            bally.setDisplay(4, digit, (unsigned char) (credits / 10));
+        } else {
+            bally.setDisplay(4, digit, 15);
         }
     }
 }
@@ -305,10 +385,21 @@ void setup() {//setup:
     bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, true);
 }
 
-bool getAnyPlayFieldSwitch() {
+/*bool getAnyPlayFieldSwitch() {
     unsigned char res = 0;
     for (int i = 0; i < N_SWITCH_ROWS; i++)
         res |= bally.getSwitchRow(i);
+    return res;
+}*/
+
+bool getAnyPlayFieldSwitch() {
+    bool res = false;
+    res = getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() ||
+          getRightFlipperFeadLane()
+          || getLeftFlipperFeadLane() || getBottomBLane() || getBottomALane() || getTopBLane() || getTopALane()
+          || getRightOutLane() || getLeftOutLane() || getRightSlingshot() || getLeftSlingshot() ||
+          getBottomRightPopBumper()
+          || getBottomLeftPopBumper() || getTopRightPopBumper() || getTopLeftPopBumper();
     return res;
 }
 
@@ -332,42 +423,48 @@ void loop() {
     bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, true);
 //        wait for credit (play) button to be pressed
     int button;
-    while (numPlayers < 4 && !getAnyPlayFieldSwitch()) {
-        button = bally.waitForTestCreditCoin(CREDIT_START_BUTTON_ROW, CREDIT_START_BUTTON_COL,
-                                             COIN_III_COIN_RETURN_BUTTON_ROW, COIN_III_COIN_RETURN_BUTTON_COL);
-        switch (button) {
-            case TEST: {
-                exit(0); //trigger reset
-                break;
-            }
-            case CREDIT: {
-                credits++;
-                break;
-            }
-            case COIN: {//like a select/start button
-                if (credits > 0 && numPlayers < 4) {
-                    credits--;
-                    numPlayers++;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-//turn off game over
-    bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, false);
-//indicate #players=1
     int canPlay[4][2] = {{CAN_PLAY_1_ROW, CAN_PLAY_1_COL},
                          {CAN_PLAY_2_ROW, CAN_PLAY_2_COL},
                          {CAN_PLAY_3_ROW, CAN_PLAY_3_COL},
                          {CAN_PLAY_4_ROW, CAN_PLAY_4_COL}};
-    bally.setLamp(canPlay[numPlayers - 1][0], canPlay[numPlayers - 1][1], true);
+    while (numPlayers < 4 && !(ballInPlay = getAnyPlayFieldSwitch())) {
+        delay(8);
+        creditBallDisplay(ballNums[curPlayer], credits);
+        if (bally.getCabSwitch(CREDIT_START_BUTTON_ROW, CREDIT_START_BUTTON_COL)) {//like a select/start button
+            if (credits > 0 && numPlayers < 4) {
+                credits--;
+                numPlayers++;
+                delay(1000);
+            }
+        }
+        if (bally.getCabSwitch(COIN_III_COIN_RETURN_BUTTON_ROW, COIN_III_COIN_RETURN_BUTTON_COL)) {
+            credits++;
+            delay(1000);
+        }/* else if (digitalRead(TESTPIN)==LOW) {
+            exit(0);
+        }*/
+
+        for (int i = 0; i < 4; i++) {
+            if (i == numPlayers - 1)
+                bally.setLamp(canPlay[i][0], canPlay[i][1], true);
+            else
+                bally.setLamp(canPlay[i][0], canPlay[i][1], false);
+        }
+    }
+
+//turn off game over
+    bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, false);
+    //ballInPlay = true;
+//indicate #players=1
+
 
 //init score displays to zero
     displayScores(scores);
 //loop for each player and ball (3 balls per player per game)
-    while (ballNums[0] > 0) {
+    for (int i = 0; i < numPlayers; i++) {
+        ballNums[i] = 3;
+    }
+    while (ballNums[curPlayer] > 0) {
 //zero the switch memory so don’t retain sticky hits from before
         for (int i = 0; i < N_SWITCH_ROWS; i++)
             bally.getRedgeRow(i);
@@ -381,18 +478,27 @@ void loop() {
         curPlayer = 0;
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
 //      fire the outhole solenoid to eject a ball
+        delay(1000);
         fireOutHole();
+        ballInPlay = true;
         enableFlipper();
 //      loop, reading each playfield switch
-        bool stopRequested = false;
-        while (!stopRequested) {
+
+        while (ballInPlay) {
 //          for each switch hit, take appropriate action (add player (ie. increment score),
 //          fire solenoid, add points, play chime, arm bonus, etc.)
 //          until the outlane switch is read
-            
+            getAnyPlayFieldSwitch();
+            getOutHole();
         }
-//      advance current player and/or ball number
+        //      advance current player and/or ball number
+        if (ballNums[curPlayer] > 0)
+            ballNums[curPlayer]--;
+        else
+            curPlayer++;
+//TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay
 //      until each player has played 3 balls
+
     }
 //        check for high score (optional)
 //perform random score match (optional), fire knocker on match
