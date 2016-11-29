@@ -193,6 +193,7 @@ Bally bally;
 #define SLAM_COL 7
 
 bool fireSaucer() {
+    delay(500);
     return bally.fireSolenoid(SAUCER_KICK_OUT, true);
 }
 
@@ -336,9 +337,9 @@ void parseDisplay(int dispID, unsigned long score ){
 }
 */
 
-void displayScores(unsigned long num[]) {
+void displayScores(unsigned long num[], int numPlayers) {
     unsigned long playerScore[] = {num[0], num[1], num[2], num[3], num[4]};
-    for (int display_index = 0; display_index < N_DISPLAYS - 1; display_index++) {  //for each display
+    for (int display_index = 0; display_index < numPlayers; display_index++) {  //for each display
         for (int digit_index = 0; digit_index < N_DIGITS; digit_index++) {  //for each digit
             int digDecVal = (int) (playerScore[display_index] % 10); //stores the lowest digit
             unsigned char digByte = (unsigned char) digDecVal; //casts to unsigned char
@@ -369,7 +370,7 @@ void creditBallDisplay(int ballNum, int credits) {
 }
 
 void blankDisplays() {
-    for (int disp = 0; disp < 3; disp++) {
+    for (int disp = 0; disp < 4; disp++) {
         for (int digit = 0; digit < 7; digit++) {
             bally.setDisplay(disp, digit, 15);
         }
@@ -394,7 +395,7 @@ void setup() {//setup:
 
 bool getAnyPlayFieldSwitch() {
     bool res = false;
-    res = getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() ||
+    res = getOutHole() || getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() ||
           getRightFlipperFeadLane()
           || getLeftFlipperFeadLane() || getBottomBLane() || getBottomALane() || getTopBLane() || getTopALane()
           || getRightOutLane() || getLeftOutLane() || getRightSlingshot() || getLeftSlingshot() ||
@@ -427,22 +428,29 @@ void loop() {
                          {CAN_PLAY_2_ROW, CAN_PLAY_2_COL},
                          {CAN_PLAY_3_ROW, CAN_PLAY_3_COL},
                          {CAN_PLAY_4_ROW, CAN_PLAY_4_COL}};
-    while (numPlayers < 4 && !(ballInPlay = getAnyPlayFieldSwitch())) {
+    getOutHole();//discard rising edge
+    delay(1000);
+    while ((numPlayers < 4 && !(ballInPlay = getAnyPlayFieldSwitch())) || numPlayers == 0) {
         delay(8);
-        creditBallDisplay(ballNums[curPlayer], credits);
         if (bally.getCabSwitch(CREDIT_START_BUTTON_ROW, CREDIT_START_BUTTON_COL)) {//like a select/start button
             if (credits > 0 && numPlayers < 4) {
                 credits--;
                 numPlayers++;
-                delay(1000);
+                if(numPlayers==1){
+                    fireOutHole();
+                    enableFlipper();
+                }
+                delay(250);
             }
         }
         if (bally.getCabSwitch(COIN_III_COIN_RETURN_BUTTON_ROW, COIN_III_COIN_RETURN_BUTTON_COL)) {
             credits++;
-            delay(1000);
+            delay(250);
         }/* else if (digitalRead(TESTPIN)==LOW) {
             exit(0);
         }*/
+
+        creditBallDisplay(ballNums[curPlayer], credits);
 
         for (int i = 0; i < 4; i++) {
             if (i == numPlayers - 1)
@@ -459,12 +467,14 @@ void loop() {
 
 
 //init score displays to zero
-    displayScores(scores);
+    displayScores(scores, numPlayers);
 //loop for each player and ball (3 balls per player per game)
     for (int i = 0; i < numPlayers; i++) {
         ballNums[i] = 3;
     }
+    curPlayer = 0;
     while (ballNums[curPlayer] > 0) {
+        creditBallDisplay(ballNums[curPlayer], credits);
 //zero the switch memory so don’t retain sticky hits from before
         for (int i = 0; i < N_SWITCH_ROWS; i++)
             bally.getRedgeRow(i);
@@ -475,16 +485,24 @@ void loop() {
                               {PLAYER_2_UP_ROW, PLAYER_2_UP_COL},
                               {PLAYER_3_UP_ROW, PLAYER_3_UP_COL},
                               {PLAYER_4_UP_ROW, PLAYER_4_UP_COL}};
-        curPlayer = 0;
+
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
 //      fire the outhole solenoid to eject a ball
         delay(1000);
         fireOutHole();
+
         ballInPlay = true;
         enableFlipper();
 //      loop, reading each playfield switch
 
         while (ballInPlay) {
+            Serial.print("curPlayer=");
+            Serial.print(curPlayer);
+            Serial.print(", ");
+
+            Serial.print("numPlayers=");
+            Serial.print(numPlayers);
+            Serial.println("");
 //          for each switch hit, take appropriate action (add player (ie. increment score),
 //          fire solenoid, add points, play chime, arm bonus, etc.)
 //          until the outlane switch is read
@@ -492,11 +510,17 @@ void loop() {
             getOutHole();
         }
         //      advance current player and/or ball number
-        if (ballNums[curPlayer] > 0)
+        if (ballNums[curPlayer] > 0){
             ballNums[curPlayer]--;
-        else
-            curPlayer++;
-//TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay
+            //creditBallDisplay(ballNums[curPlayer], credits);
+        }
+
+        bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], false);
+        curPlayer++;
+        curPlayer%=numPlayers;
+        bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
+
+//TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay, blankScoreDisplays
 //      until each player has played 3 balls
 
     }
