@@ -210,6 +210,8 @@ int feedLaneBonusMultipliers[4][2]={{BONUS_2X_LOW_ROW, BONUS_2X_LOW_COL}, {BONUS
 #define SLAM_ROW 1
 #define SLAM_COL 7
 
+int totalBalls = 0;
+
 bool fireSaucer() {
     return bally.fireSolenoid(SAUCER_KICK_OUT, true);
 }
@@ -327,8 +329,21 @@ int dropTargets[8][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BO
 
 //bool rightDropTargetsAllDown = false, leftDropTargetsAllDown = false;
 //bool dropTargetsAllDown = false;
+
+void ballAdDec(int adDec){
+  if(adDec > 0){
+    ballNums[curPlayer]++;
+    totalBalls++;
+  }
+  else{
+    ballNums[curPlayer]--;
+    totalBalls--;
+  }
+}
+
 bool dropTargetsDown[8] = {false, false, false, false, false, false, false, false};
 bool whenLit = false;
+bool popBumperBonus = false;
 bool getDropTarget() {
     bool anyRes = false;
     for (int i = 0; i < 8; i++) {
@@ -368,10 +383,13 @@ bool getDropTarget() {
         for (int i = 0; i < 8; i++)
             dropTargetsDown[i] = false;
         scores[curPlayer]+=50000;
+        popBumperBonus = true;
+        bally.setLamp(WHEN_LIT_ROW, WHEN_LIT_COL, popBumperBonus);
+        bally.setLamp(WHEN_LIT_ROW, WHEN_LIT_COL, popBumperBonus);
         displayScores(scores, numPlayers);
         if(whenLit) {
             whenLit = false;
-            ballNums[curPlayer]++;
+            ballAdDec(1);
             creditBallDisplay(ballNums[curPlayer], credits);
         } else {
             whenLit = true;
@@ -723,7 +741,10 @@ bool getAnyPlayFieldSwitch() {
 }
 
 void loop() {
-
+  int playerUp[4][2] = {{PLAYER_1_UP_ROW, PLAYER_1_UP_COL},
+                        {PLAYER_2_UP_ROW, PLAYER_2_UP_COL},
+                        {PLAYER_3_UP_ROW, PLAYER_3_UP_COL},
+                        {PLAYER_4_UP_ROW, PLAYER_4_UP_COL}};
 
 //loop:
 //        (each time thru the loop represents one complete game)
@@ -801,7 +822,23 @@ void loop() {
         ballNums[i] = 3;
     }
     curPlayer = 0;
-    while (ballNums[curPlayer] > 0) {
+    totalBalls = numPlayers*3;
+    while (/*ballNums[curPlayer]*/totalBalls > 0) {
+      Serial.print("totalBalls: ");
+      Serial.println(totalBalls);
+      Serial.print("current player balls: ");
+      int tempCurPlayer = curPlayer;
+      Serial.println(ballNums[curPlayer]);
+        while(ballNums[curPlayer] <= 0){
+          Serial.println("ballnums loop");
+          curPlayer++;
+          curPlayer %= numPlayers;
+        }
+        if(tempCurPlayer != curPlayer){
+          bally.setLamp(playerUp[tempCurPlayer][0], playerUp[tempCurPlayer][1], false);
+          bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
+        }
+        
         bally.setLamp(abLaneBonuses[abLaneBonus][0], abLaneBonuses[abLaneBonus][1], true);
         creditBallDisplay(ballNums[curPlayer], credits);
 //zero the switch memory so don’t retain sticky hits from before
@@ -816,10 +853,7 @@ void loop() {
         for (int i = 0; i < 8; i++)
             dropTargetsDown[i] = false;
 //light current player up and display the ball number
-        int playerUp[4][2] = {{PLAYER_1_UP_ROW, PLAYER_1_UP_COL},
-                              {PLAYER_2_UP_ROW, PLAYER_2_UP_COL},
-                              {PLAYER_3_UP_ROW, PLAYER_3_UP_COL},
-                              {PLAYER_4_UP_ROW, PLAYER_4_UP_COL}};
+        
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
 //      fire the outhole solenoid to eject a ball
         delay(1000);
@@ -847,7 +881,7 @@ void loop() {
         }
         //      advance current player and/or ball number
         if (ballNums[curPlayer] > 0) {
-            ballNums[curPlayer]--;
+            ballAdDec(-1);
             //creditBallDisplay(ballNums[curPlayer], credits);
         }
         whenLit = false;
@@ -870,7 +904,10 @@ void loop() {
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], false);
         curPlayer++;
         curPlayer %= numPlayers;
-        bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
+        if(totalBalls > 0){
+          bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
+        }
+        
 
 //TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay, blankScoreDisplays
 //      until each player has played 3 balls
