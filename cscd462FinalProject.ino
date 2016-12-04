@@ -105,11 +105,11 @@ Bally bally;
 
 //momentary solenoids
 #define SAUCER_KICK_OUT 0
-//#define CHIME_10 8
-//#define CHIME_100 4
-//12 Chime 1000
-//2 Chime 10000
-//10 Knocker
+#define CHIME_10 8
+#define CHIME_100 4
+#define CHIME_1000 12
+#define CHIME_10000 2
+#define KNOCKER 10
 #define OUT_HOLE_KICK 6
 #define BOTTOM_LEFT_POP_BUMPER 14
 #define TOP_LEFT_POP_BUMPER 1
@@ -193,7 +193,6 @@ Bally bally;
 #define SLAM_COL 7
 
 bool fireSaucer() {
-    delay(500);
     return bally.fireSolenoid(SAUCER_KICK_OUT, true);
 }
 
@@ -210,6 +209,7 @@ bool ballInPlay = false;
 bool getOutHole() {
     bool res = bally.getRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
     if (res) {
+        bally.playSound(37);//TOO BAD
         ballInPlay = false;
     }
     return res;
@@ -218,7 +218,14 @@ bool getOutHole() {
 bool getTopCenterKickOut() {
     bool res = bally.getRedge(TOP_CENTER_KICK_OUT_ROW, TOP_CENTER_KICK_OUT_COL);
     if (res) {
-        bally.fireSolenoid(SAUCER_KICK_OUT, false);
+        bally.fireSolenoid(CHIME_10, true);
+        delay(300);
+        bally.fireSolenoid(CHIME_100, false);
+        delay(200);
+        bally.fireSolenoid(CHIME_1000, false);
+        delay(100);
+        res = bally.getRedge(TOP_CENTER_KICK_OUT_ROW, TOP_CENTER_KICK_OUT_COL);
+        fireSaucer();
     }
     return res;
 }
@@ -228,22 +235,77 @@ int rightDropTarget[4][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_
                              {RIGHT_DROP_TARGET_B_ROW,        RIGHT_DROP_TARGET_B_COL},
                              {RIGHT_DROP_TARGET_A_TOP_ROW,    RIGHT_DROP_TARGET_A_TOP_COL}};
 
+//bool rightDropTargetsAllDown = false;
 bool getRightDropTarget() {
-    bool res = false;
-    for (int i = 0; i < 4; i++)
-        res |= bally.getRedge(rightDropTarget[i][0], rightDropTarget[i][1]);
-    return res;
+    static bool res[4] = {false, false, false, false};
+    for (int i = 0; i < 4; i++) {
+        bool cur = bally.getRedge(rightDropTarget[i][0], rightDropTarget[i][1]);
+        if(cur) {
+            res[i] = cur;
+            bally.playSound(3);
+        }
+    }
+    bool anyRes = res[0] || res[1] || res[2] || res[3];
+
+    bool allRes = res[0] && res[1] && res[2] && res[3];
+    if (allRes) {
+        //rightDropTargetsAllDown = true;
+        for(int i = 0; i < 4; i++)
+            res[i]=false;
+        delay(250);
+        bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, false);
+        bally.playSound(4);
+    }
+
+
+    return anyRes;
 }
+
+
 
 int leftDropTarget[4][2] = {{LEFT_DROP_TARGET_D_BOTTOM_ROW, LEFT_DROP_TARGET_D_BOTTOM_COL},
                             {LEFT_DROP_TARGET_C_ROW,        LEFT_DROP_TARGET_C_COL},
                             {LEFT_DROP_TARGET_B_ROW,        LEFT_DROP_TARGET_B_COL},
                             {LEFT_DROP_TARGET_A_TOP_ROW,    LEFT_DROP_TARGET_A_TOP_COL}};
 
+
+//bool leftDropTargetsAllDown = false;
 bool getLeftDropTarget() {
-    bool res = false;
-    for (int i = 0; i < 4; i++)
-        res |= bally.getRedge(leftDropTarget[i][0], leftDropTarget[i][1]);
+    static bool res[4] = {false, false, false, false};
+    for (int i = 0; i < 4; i++) {
+        bool cur = bally.getRedge(leftDropTarget[i][0], leftDropTarget[i][1]);
+        if(cur) {
+            res[i] = cur;
+            bally.playSound(3);
+        }
+    }
+    bool anyRes = res[0] || res[1] || res[2] || res[3];
+
+
+    bool allRes = res[0] && res[1] && res[2] && res[3];
+    if (allRes) {
+        //leftDropTargetsAllDown = true;
+        for(int i = 0; i < 4; i++)
+            res[i]=false;
+        delay(250);
+        bally.fireSolenoid(LEFT_DROP_TARGET_RESET, false);
+        bally.playSound(4);
+    }
+
+
+    return anyRes;
+}
+
+bool getDropTargetRebound() {
+    bool res = bally.getRedge(DROP_TARGET_REBOUND_ROW, DROP_TARGET_REBOUND_COL);
+    if (res /*&& (rightDropTargetsAllDown || leftDropTargetsAllDown)*/) {
+        bally.playSound(4);//3 bells
+//        bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, true);
+//        delay(10);
+//        bally.fireSolenoid(LEFT_DROP_TARGET_RESET, true);
+//        rightDropTargetsAllDown = false;
+//        leftDropTargetsAllDown = false;
+    }
     return res;
 }
 
@@ -283,6 +345,7 @@ bool getRightSlingshot() {
     bool res = bally.getRedge(RIGHT_SLINGSHOT_ROW, RIGHT_SLINGSHOT_COL);
     if (res) {
         bally.fireSolenoid(RIGHT_SLINGSHOT, false);
+        //TODO: SOUND
     }
     return res;
 }
@@ -395,7 +458,7 @@ void setup() {//setup:
 
 bool getAnyPlayFieldSwitch() {
     bool res = false;
-    res = getOutHole() || getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() ||
+    res = getOutHole() || getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() || getDropTargetRebound() ||
           getRightFlipperFeadLane()
           || getLeftFlipperFeadLane() || getBottomBLane() || getBottomALane() || getTopBLane() || getTopALane()
           || getRightOutLane() || getLeftOutLane() || getRightSlingshot() || getLeftSlingshot() ||
@@ -418,6 +481,7 @@ void loop() {
     int ballNums[4] = {0, 0, 0, 0};
 //drop target
     bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, true);
+    delay(10);
     bally.fireSolenoid(LEFT_DROP_TARGET_RESET, true);
 //counters, any other game and/or ball state variables
 //        init H/W, such as game over lamp
@@ -436,7 +500,7 @@ void loop() {
             if (credits > 0 && numPlayers < 4) {
                 credits--;
                 numPlayers++;
-                if(numPlayers==1){
+                if (numPlayers == 1) {
                     fireOutHole();
                     enableFlipper();
                 }
@@ -451,7 +515,6 @@ void loop() {
         }*/
 
         creditBallDisplay(ballNums[curPlayer], credits);
-
         for (int i = 0; i < 4; i++) {
             if (i == numPlayers - 1)
                 bally.setLamp(canPlay[i][0], canPlay[i][1], true);
@@ -485,12 +548,10 @@ void loop() {
                               {PLAYER_2_UP_ROW, PLAYER_2_UP_COL},
                               {PLAYER_3_UP_ROW, PLAYER_3_UP_COL},
                               {PLAYER_4_UP_ROW, PLAYER_4_UP_COL}};
-
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
 //      fire the outhole solenoid to eject a ball
         delay(1000);
         fireOutHole();
-
         ballInPlay = true;
         enableFlipper();
 //      loop, reading each playfield switch
@@ -499,7 +560,6 @@ void loop() {
             Serial.print("curPlayer=");
             Serial.print(curPlayer);
             Serial.print(", ");
-
             Serial.print("numPlayers=");
             Serial.print(numPlayers);
             Serial.println("");
@@ -510,14 +570,13 @@ void loop() {
             getOutHole();
         }
         //      advance current player and/or ball number
-        if (ballNums[curPlayer] > 0){
+        if (ballNums[curPlayer] > 0) {
             ballNums[curPlayer]--;
             //creditBallDisplay(ballNums[curPlayer], credits);
         }
-
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], false);
         curPlayer++;
-        curPlayer%=numPlayers;
+        curPlayer %= numPlayers;
         bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
 
 //TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay, blankScoreDisplays
