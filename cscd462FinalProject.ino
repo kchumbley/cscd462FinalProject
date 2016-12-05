@@ -681,7 +681,7 @@ bool getRightOutLane() {
     res = bally.getRedge(RIGHT_OUT_LANE_ROW, RIGHT_OUT_LANE_COL);
     if(res){
         advanceFeedLaneBonus();
-        scores[curPlayer]+=500;
+        scores[curPlayer]+=1000;
         displayScores(scores, numPlayers);
         bally.playSound(9);
     }
@@ -693,7 +693,7 @@ bool getLeftOutLane() {
     res = bally.getRedge(LEFT_OUT_LANE_ROW, LEFT_OUT_LANE_COL);
     if(res){
         advanceFeedLaneBonus();
-        scores[curPlayer]+=500;
+        scores[curPlayer]+=1000;
         displayScores(scores, numPlayers);
         bally.playSound(9);
     }
