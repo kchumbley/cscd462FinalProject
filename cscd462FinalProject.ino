@@ -1,11 +1,8 @@
 #include <BallyLib.h>
 
 Bally bally;
-#define TESTPIN 3
+//#define TESTPIN 3
 //Lamps
-//#define GAME_OVER_LAMP_ROW 12
-//#define GAME_OVER_LAMP_COL 2
-
 #define BONUS_4K_ROW 0
 #define BONUS_4K_COL 3
 #define BONUS_3K_ROW 0
@@ -58,10 +55,10 @@ int feedLaneBonusScores[11][2] = {{BONUS_1K_ROW, BONUS_1K_COL}, {BONUS_2K_ROW, B
 int abLaneBonuses[7][2] = {{AB_1K_ROW, AB_1K_COL}, {AB_2K_ROW, AB_2K_COL}, {AB_3K_ROW, AB_3K_COL},
                            {AB_4K_ROW, AB_4K_COL}, {AB_5K_ROW, AB_5K_COL}, {EXTRA_BALL_ROW, EXTRA_BALL_COL},
                            {SPECIAL_ROW, SPECIAL_COL}};
-#define L_WHEN_LIT_50K_ROW 7
-#define L_WHEN_LIT_50K_COL 3
-#define R_WHEN_LIT_50K__ROW 7
-#define R_WHEN_LIT_50K__COL 2
+//#define L_WHEN_LIT_50K_ROW 7
+//#define L_WHEN_LIT_50K_COL 3
+//#define R_WHEN_LIT_50K__ROW 7
+//#define R_WHEN_LIT_50K__COL 2
 #define LEFT_LOW_POP_ROW 8
 #define LEFT_LOW_POP_COL 3
 #define RIGHT_LOW_POP_ROW 8
@@ -76,14 +73,14 @@ int abLaneBonuses[7][2] = {{AB_1K_ROW, AB_1K_COL}, {AB_2K_ROW, AB_2K_COL}, {AB_3
 int sinkholeBonuses[3][2] = {{BONUS_2X_TOP_ROW, BONUS_2X_TOP_COL},{BONUS_3X_TOP_ROW, BONUS_3X_TOP_COL},
                          {BONUS_5X_TOP_ROW, BONUS_5X_TOP_COL}};
 
-#define CREDIT_INDICATOR_ROW 10
-#define CREDIT_INDICATOR_COL 3
+//#define CREDIT_INDICATOR_ROW 10
+//#define CREDIT_INDICATOR_COL 3
 #define SHOOT_AGAIN_ROW 10
 #define SHOOT_AGAIN_COL 2
-#define MATCH_ROW 10
-#define MATCH_COL 1
-#define SAME_PLAYER_SHOOT_AGAIN_ROW 10
-#define SAME_PLAYER_SHOOT_AGAIN_COL 0
+//#define MATCH_ROW 10
+//#define MATCH_COL 1
+//#define SAME_PLAYER_SHOOT_AGAIN_ROW 10
+//#define SAME_PLAYER_SHOOT_AGAIN_COL 0
 #define BONUS_2X_LOW_ROW 11
 #define BONUS_2X_LOW_COL 3
 #define BONUS_3X_LOW_ROW 11
@@ -93,12 +90,12 @@ int sinkholeBonuses[3][2] = {{BONUS_2X_TOP_ROW, BONUS_2X_TOP_COL},{BONUS_3X_TOP_
 
 int feedLaneBonusMultipliers[4][2]={{BONUS_2X_LOW_ROW, BONUS_2X_LOW_COL}, {BONUS_3X_LOW_ROW, BONUS_3X_LOW_COL},
                                     {BONUS_5X_LOW_ROW, BONUS_5X_LOW_COL}, {SHOOT_AGAIN_ROW, SHOOT_AGAIN_COL}};
-#define TILT_LAMP_ROW 12
-#define TILT_LAMP_COL 3
+//#define TILT_LAMP_ROW 12
+//#define TILT_LAMP_COL 3
 #define GAME_OVER_ROW 12
 #define GAME_OVER_COL 2
-#define HIGH_GAME_TO_DATE_ROW 12
-#define HIGH_GAME_TO_DATE_COL 1
+//#define HIGH_GAME_TO_DATE_ROW 12
+//#define HIGH_GAME_TO_DATE_COL 1
 #define BALL_IN_PLAY_ROW 12
 #define BALL_IN_PLAY_COL 0
 #define CAN_PLAY_4_ROW 13
@@ -127,7 +124,7 @@ int feedLaneBonusMultipliers[4][2]={{BONUS_2X_LOW_ROW, BONUS_2X_LOW_COL}, {BONUS
 #define CHIME_100 4
 #define CHIME_1000 12
 #define CHIME_10000 2
-#define KNOCKER 10
+//#define KNOCKER 10
 #define OUT_HOLE_KICK 6
 #define BOTTOM_LEFT_POP_BUMPER 14
 #define TOP_LEFT_POP_BUMPER 1
@@ -145,8 +142,8 @@ int feedLaneBonusMultipliers[4][2]={{BONUS_2X_LOW_ROW, BONUS_2X_LOW_COL}, {BONUS
 //3 Not Used
 
 //playfield switchs
-#define TILT_SWITCH_ROW 0
-#define TILT_SWITCH_COL 6
+//#define TILT_SWITCH_ROW 0
+//#define TILT_SWITCH_COL 6
 #define OUT_HOLE_ROW 0
 #define OUT_HOLE_COL 7
 #define RIGHT_DROP_TARGET_D_BOTTOM_ROW 2
@@ -207,8 +204,8 @@ int feedLaneBonusMultipliers[4][2]={{BONUS_2X_LOW_ROW, BONUS_2X_LOW_COL}, {BONUS
 //#define COIN_I_NOT_USED_COL 1
 //#define COIN_II_NOT_USED_ROW 1
 //#define COIN_II_NOT_USED_COL 2
-#define SLAM_ROW 1
-#define SLAM_COL 7
+//#define SLAM_ROW 1
+//#define SLAM_COL 7
 
 int totalBalls = 0;
 
@@ -217,7 +214,10 @@ bool fireSaucer() {
 }
 
 bool fireOutHole() {
-    return bally.fireSolenoid(OUT_HOLE_KICK, true);
+    bool res =  bally.fireSolenoid(OUT_HOLE_KICK, true);
+    delay(500);
+    bally.getDebRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
+    return res;
 }
 
 bool enableFlipper() {
@@ -225,14 +225,14 @@ bool enableFlipper() {
 }
 
 bool ballInPlay = false;
-int feedLaneBonusMultiplier = 1, feedLaneBonusScore = 0, sinkholeBonus = 0, abLaneBonus = 0;
+int feedLaneBonusMultiplierIndex = 0, feedLaneBonusScoreIndex = 0, sinkholeBonus = 0, abLaneBonus = 0;
 
 
 unsigned long scores[4] = {0, 0, 0, 0};
 int numPlayers = 0, curPlayer = 0;
 int ballNums[4] = {0, 0, 0, 0};
 int credits = 0;
-unsigned long highScore = 0;
+//unsigned long highScore = 0;
 
 void displayScores(unsigned long num[], int numPlayers) {
     unsigned long playerScore[] = {num[0], num[1], num[2], num[3], num[4]};
@@ -266,12 +266,94 @@ void creditBallDisplay(int ballNum, int credits) {
     }
 }
 
+void ballAdDec(int adDec){
+    if(adDec > 0){
+        if(ballNums[curPlayer] < 5) {
+            ballNums[curPlayer]++;
+            totalBalls++;
+        }
+    }
+    else{
+        ballNums[curPlayer]--;
+        totalBalls--;
+    }
+    creditBallDisplay(ballNums[curPlayer], credits);
+}
+
+void advanceFeedLaneBonus(){
+    bally.setLamp(feedLaneBonusScores[feedLaneBonusScoreIndex][0],
+                  feedLaneBonusScores[feedLaneBonusScoreIndex][1], false);
+    if(feedLaneBonusMultiplierIndex<4) {
+        feedLaneBonusScoreIndex++;
+    }
+    if(feedLaneBonusScoreIndex==11) {
+        if(feedLaneBonusMultiplierIndex != 0) {
+            bally.setLamp(feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex-1][0],
+                          feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex-1][1], false);
+        }
+        if(feedLaneBonusMultiplierIndex<5){
+            feedLaneBonusMultiplierIndex++;
+        }
+        if(feedLaneBonusMultiplierIndex==5) {
+            ballAdDec(1);
+        }
+    }
+    feedLaneBonusScoreIndex%=11;
+    bally.setLamp(feedLaneBonusScores[feedLaneBonusScoreIndex][0],
+                  feedLaneBonusScores[feedLaneBonusScoreIndex][1], true);
+    if(feedLaneBonusMultiplierIndex != 0) {
+        bally.setLamp(feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][0],
+                      feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][1], true);
+    }
+
+}
+
+void collectFeedLaneBonus(){
+    unsigned long score = 0;
+    if(feedLaneBonusScoreIndex<10) {
+        score = (unsigned long) ((feedLaneBonusScoreIndex + 1) * 1000);
+    } else {
+        score = 20000;
+    }
+    if(feedLaneBonusMultiplierIndex < 3) {
+        score *= feedLaneBonusMultiplierIndex + 1;
+    } else if(feedLaneBonusMultiplierIndex == 4){
+        score *= 5;
+    }
+
+    if(feedLaneBonusMultiplierIndex < 5) {
+        scores[curPlayer]+=score;
+        displayScores(scores, numPlayers);
+    }  else if(feedLaneBonusMultiplierIndex == 5){
+        ballAdDec(1);
+        creditBallDisplay(ballNums[curPlayer], credits);
+    }
+
+
+    bally.setLamp(feedLaneBonusScores[feedLaneBonusScoreIndex][0],
+                  feedLaneBonusScores[feedLaneBonusScoreIndex][1], false);
+    if(feedLaneBonusMultiplierIndex != 0) {
+        bally.setLamp(feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][0],
+                      feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][1], false);
+    }
+    feedLaneBonusMultiplierIndex = 0;
+    feedLaneBonusScoreIndex = 0;
+    bally.setLamp(feedLaneBonusScores[feedLaneBonusScoreIndex][0],
+                  feedLaneBonusScores[feedLaneBonusScoreIndex][1], true);
+    if(feedLaneBonusMultiplierIndex != 0) {
+        bally.setLamp(feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][0],
+                      feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][1], true);
+    }
+}
+
 bool getOutHole() {
     bool res = bally.getDebRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
     if (res && ballInPlay) {
         bally.playSound(37);//TOO BAD
         ballInPlay = false;
         bally.setLamp(BALL_IN_PLAY_ROW, BALL_IN_PLAY_COL, ballInPlay);
+//        delay(500);
+//        bally.getDebRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
     }
     return res;
 }
@@ -290,15 +372,19 @@ bool getTopCenterKickOut() {
         scores[curPlayer]+=score;
         displayScores(scores, numPlayers);
         if(sinkholeBonus==0) {
-            bally.setLamp(sinkholeBonuses[3][0], sinkholeBonuses[3][0], false);
+            //bally.setLamp(sinkholeBonuses[2][0], sinkholeBonuses[2][0], false);
             sinkholeBonus++;
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], true);
+            Serial.print("if ");
+            Serial.println(sinkholeBonus-1);
         }
-        else {
+        else if(sinkholeBonus<3) {
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], false);
             sinkholeBonus++;
-            sinkholeBonus %= 4;
+            //sinkholeBonus %= 4;
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], true);
+            Serial.print("else ");
+            Serial.println(sinkholeBonus-1);
         }
 
         bally.fireSolenoid(CHIME_10, true);
@@ -330,20 +416,12 @@ int dropTargets[8][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BO
 //bool rightDropTargetsAllDown = false, leftDropTargetsAllDown = false;
 //bool dropTargetsAllDown = false;
 
-void ballAdDec(int adDec){
-  if(adDec > 0){
-    ballNums[curPlayer]++;
-    totalBalls++;
-  }
-  else{
-    ballNums[curPlayer]--;
-    totalBalls--;
-  }
-}
+
 
 bool dropTargetsDown[8] = {false, false, false, false, false, false, false, false};
 bool whenLit = false;
 bool popBumperBonus = false;
+
 bool getDropTarget() {
     bool anyRes = false;
     for (int i = 0; i < 8; i++) {
@@ -384,8 +462,8 @@ bool getDropTarget() {
             dropTargetsDown[i] = false;
         scores[curPlayer]+=50000;
         popBumperBonus = true;
-        bally.setLamp(WHEN_LIT_ROW, WHEN_LIT_COL, popBumperBonus);
-        bally.setLamp(WHEN_LIT_ROW, WHEN_LIT_COL, popBumperBonus);
+        bally.setLamp(LEFT_LOW_POP_ROW, LEFT_LOW_POP_COL, popBumperBonus);
+        bally.setLamp(RIGHT_LOW_POP_ROW, RIGHT_LOW_POP_COL, popBumperBonus);
         displayScores(scores, numPlayers);
         if(whenLit) {
             whenLit = false;
@@ -408,6 +486,8 @@ bool getDropTarget() {
 
     return anyRes;
 }
+
+
 
 /*bool getRightDropTarget() {
     static bool res[4] = {false, false, false, false};
@@ -502,6 +582,9 @@ bool getRightFlipperFeadLane() {
     bool res = false;
     res = bally.getRedge(RIGHT_FLIPPER_FEED_LANE_ROW, RIGHT_FLIPPER_FEED_LANE_COL);
     if(res){
+        advanceFeedLaneBonus();
+        scores[curPlayer]+=500;
+        displayScores(scores, numPlayers);
         bally.playSound(9);
     }
     return res;
@@ -511,6 +594,9 @@ bool getLeftFlipperFeadLane() {
     bool res = false;
     res = bally.getRedge(LEFT_FLIPPER_FEED_LANE_ROW, LEFT_FLIPPER_FEED_LANE_COL);
     if(res){
+        advanceFeedLaneBonus();
+        scores[curPlayer]+=500;
+        displayScores(scores, numPlayers);
         bally.playSound(9);
     }
     return res;
@@ -518,7 +604,7 @@ bool getLeftFlipperFeadLane() {
 
 bool aLane = false, bLane = false;
 
-void advanceLaneBonus() {
+void advanceABLaneBonus() {
     if(aLane && bLane) {
             aLane = false;
             bLane = false;
@@ -527,14 +613,16 @@ void advanceLaneBonus() {
             if(abLaneBonus<5) {
                 score = 1000 * (abLaneBonus + 1);
             } else {
-                score = 1000 * 5;
+                ballAdDec(1);
             }
+
 
             scores[curPlayer]+=score;
             displayScores(scores, numPlayers);
             bally.setLamp(abLaneBonuses[abLaneBonus][0], abLaneBonuses[abLaneBonus][1], false);
-            abLaneBonus++;
-            abLaneBonus %= 7;
+            if(abLaneBonus<6)
+                abLaneBonus++;
+            //abLaneBonus %= 7;
             bally.setLamp(abLaneBonuses[abLaneBonus][0], abLaneBonuses[abLaneBonus][1], true);
 
 
@@ -549,7 +637,7 @@ bool getBottomBLane() {
 
     if(res){
         bLane = true;
-        advanceLaneBonus();
+        advanceABLaneBonus();
         bally.playSound(9);
     }
     return res;
@@ -560,7 +648,7 @@ bool getBottomALane() {
     res = bally.getRedge(BOTTOM_A_LANE_ROW, BOTTOM_A_LANE_COL);
     if(res){
         aLane = true;
-        advanceLaneBonus();
+        advanceABLaneBonus();
         bally.playSound(9);
     }
     return res;
@@ -571,7 +659,7 @@ bool getTopBLane() {
     res =  bally.getRedge(TOP_B_LANE_ROW, TOP_B_LANE_COL);
     if(res){
         bLane = true;
-        advanceLaneBonus();
+        advanceABLaneBonus();
         bally.playSound(9);
     }
     return res;
@@ -582,7 +670,7 @@ bool getTopALane() {
     res = bally.getRedge(TOP_A_LANE_ROW, TOP_A_LANE_COL);
     if(res){
         aLane = true;
-        advanceLaneBonus();
+        advanceABLaneBonus();
         bally.playSound(9);
     }
     return res;
@@ -592,6 +680,9 @@ bool getRightOutLane() {
     bool res = false;
     res = bally.getRedge(RIGHT_OUT_LANE_ROW, RIGHT_OUT_LANE_COL);
     if(res){
+        advanceFeedLaneBonus();
+        scores[curPlayer]+=500;
+        displayScores(scores, numPlayers);
         bally.playSound(9);
     }
     return res;
@@ -601,6 +692,9 @@ bool getLeftOutLane() {
     bool res = false;
     res = bally.getRedge(LEFT_OUT_LANE_ROW, LEFT_OUT_LANE_COL);
     if(res){
+        advanceFeedLaneBonus();
+        scores[curPlayer]+=500;
+        displayScores(scores, numPlayers);
         bally.playSound(9);
     }
     return res;
@@ -624,11 +718,23 @@ bool getLeftSlingshot() {
     return res;
 }
 
+void scorePopBumperSpecial(bool special) {
+    int score = 0;
+    if(popBumperBonus && special) {
+            score = 1000;
+        } else {
+            score = 100;
+        }
+    scores[curPlayer]+=score;
+    displayScores(scores, numPlayers);
+}
+
 bool getBottomRightPopBumper() {
     bool res = bally.getRedge(BOTTOM_RIGHT_POP_BUMPER_ROW, BOTTOM_RIGHT_POP_BUMPER_COL);
     if (res) {
         bally.fireSolenoid(BOTTOM_RIGHT_POP_BUMPER, false);
         bally.fireSolenoid(CHIME_10, true);
+        scorePopBumperSpecial(true);
     }
     return res;
 }
@@ -638,6 +744,7 @@ bool getBottomLeftPopBumper() {
     if (res) {
         bally.fireSolenoid(BOTTOM_LEFT_POP_BUMPER, false);
         bally.fireSolenoid(CHIME_100, true);
+        scorePopBumperSpecial(true);
     }
     return res;
 }
@@ -649,6 +756,8 @@ bool getTopRightPopBumper() {
         Serial.println(" hit");
         bally.fireSolenoid(TOP_RIGHT_POP_BUMPER, false);
         bally.fireSolenoid(CHIME_1000, true);
+        scorePopBumperSpecial(false);
+
     }
     return res;
 }
@@ -658,6 +767,7 @@ bool getTopLeftPopBumper() {
     if (res) {
         bally.fireSolenoid(TOP_LEFT_POP_BUMPER, false);
         bally.fireSolenoid(CHIME_10000, true);
+        scorePopBumperSpecial(false);
     }
     return res;
 }
@@ -700,22 +810,13 @@ void setup() {//setup:
 
 bool getAnyPlayFieldSwitch() {
     bool res = false;
-    /*res = getOutHole() || getTopCenterKickOut() || getRightDropTarget() || getLeftDropTarget() || getDropTargetRebound() ||
-          getRightFlipperFeadLane()
-          || getLeftFlipperFeadLane() || getBottomBLane() || getBottomALane() || getTopBLane() || getTopALane()
-          || getRightOutLane() || getLeftOutLane() || getRightSlingshot() || getLeftSlingshot() ||
-          getBottomRightPopBumper()
-          || getBottomLeftPopBumper() || getTopRightPopBumper() || getTopLeftPopBumper();*/ //original
 
-//if(ballInPlay){
     res |= getBottomRightPopBumper();
     res |= getBottomLeftPopBumper();
     res |= getTopRightPopBumper();
     res |= getTopLeftPopBumper();
     res |= getOutHole();
     res |= getTopCenterKickOut();
-    /*getRightDropTarget();
-    getLeftDropTarget();*/
     res |= getDropTarget();
     res |= getDropTargetRebound();
     res |= getRightFlipperFeadLane();
@@ -728,15 +829,6 @@ bool getAnyPlayFieldSwitch() {
     res |= getLeftOutLane();
     res |= getRightSlingshot();
     res |= getLeftSlingshot();
-/*} else {
-    res = getBottomRightPopBumper() || getBottomLeftPopBumper() || getTopRightPopBumper() || getTopLeftPopBumper()
-          || getOutHole()
-          || getTopCenterKickOut()
-          || getDropTarget() *//*|| getRightDropTarget() || getLeftDropTarget() *//*|| getDropTargetRebound()
-          || getRightFlipperFeadLane() || getLeftFlipperFeadLane()
-          || getBottomBLane() || getBottomALane() || getTopBLane() || getTopALane()
-          || getRightOutLane() || getLeftOutLane() || getRightSlingshot() || getLeftSlingshot();
-}*/
     return res;
 }
 
@@ -749,14 +841,12 @@ void loop() {
 //loop:
 //        (each time thru the loop represents one complete game)
 //init S/W state: scores
-    //unsigned long scores[4] = {0, 0, 0, 0};
     for (unsigned long score: scores)
         score = 0;
 
 // player number
     numPlayers = 0, curPlayer = 0;
 //ball number,
-    //int ballNums[4] = {0, 0, 0, 0};
     for (int ballNum: ballNums)
         ballNum = 0;
 
@@ -771,7 +861,6 @@ void loop() {
 //        init H/W, such as game over lamp
     bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, true);
 //        wait for credit (play) button to be pressed
-    int button;
     int canPlay[4][2] = {{CAN_PLAY_1_ROW, CAN_PLAY_1_COL},
                          {CAN_PLAY_2_ROW, CAN_PLAY_2_COL},
                          {CAN_PLAY_3_ROW, CAN_PLAY_3_COL},
@@ -796,9 +885,7 @@ void loop() {
             credits++;
             bally.playSound(23);
             delay(250);
-        }/* else if (digitalRead(TESTPIN)==LOW) {
-            exit(0);
-        }*/
+        }
 
         creditBallDisplay(ballNums[curPlayer], credits);
         for (int i = 0; i < 4; i++) {
@@ -811,12 +898,17 @@ void loop() {
 
 //turn off game over
     bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, false);
-    //ballInPlay = true;
 //indicate #players=1
 
 
 //init score displays to zero
     displayScores(scores, numPlayers);
+    bally.setLamp(feedLaneBonusScores[feedLaneBonusScoreIndex][0],
+                  feedLaneBonusScores[feedLaneBonusScoreIndex][1], true);
+    if(feedLaneBonusMultiplierIndex != 0) {
+        bally.setLamp(feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][0],
+                      feedLaneBonusMultipliers[feedLaneBonusMultiplierIndex - 1][1], true);
+    }
 //loop for each player and ball (3 balls per player per game)
     for (int i = 0; i < numPlayers; i++) {
         ballNums[i] = 3;
@@ -846,6 +938,8 @@ void loop() {
             bally.getRedgeRow(i);
 //init any S/W and H/W state that should reset on each ball
         //TODO:implement bonus
+
+
         bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, true, true);
         delay(10);
         bally.fireSolenoid(LEFT_DROP_TARGET_RESET, true, true);
@@ -897,7 +991,11 @@ void loop() {
         bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], false);
         sinkholeBonus = 0;
 
+        popBumperBonus = false;
+        bally.setLamp(LEFT_LOW_POP_ROW, LEFT_LOW_POP_COL, popBumperBonus);
+        bally.setLamp(RIGHT_LOW_POP_ROW, RIGHT_LOW_POP_COL, popBumperBonus);
 
+        collectFeedLaneBonus();
 
 
 
@@ -907,38 +1005,11 @@ void loop() {
         if(totalBalls > 0){
           bally.setLamp(playerUp[curPlayer][0], playerUp[curPlayer][1], true);
         }
-        
-
-//TODO:update playerUp[curPlayer] lamps, ballNum[curPlayer] display and ballInPLay, blankScoreDisplays
 //      until each player has played 3 balls
 
     }
 //        check for high score (optional)
 //perform random score match (optional), fire knocker on match
-
 }
 
-
-
-
-//void setup() {
-//  Serial.begin(9600);
-//  enableFlipper();
-//  if(getOutHole()){
-//    delay(1000);
-//    fireOutHole();
-//  }
-//}
-
-//void loop() {
-//  if(getTopCenterKickOut()){
-//    delay(1000);
-//    fireSaucer();
-//  }
-//
-//if(getOutHole()){
-//    delay(1000);
-//    fireOutHole();
-//  }
-//}
 
