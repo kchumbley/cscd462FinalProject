@@ -352,15 +352,13 @@ bool getOutHole() {
         bally.playSound(37);//TOO BAD
         ballInPlay = false;
         bally.setLamp(BALL_IN_PLAY_ROW, BALL_IN_PLAY_COL, ballInPlay);
-//        delay(500);
-//        bally.getDebRedge(OUT_HOLE_ROW, OUT_HOLE_COL);
     }
     return res;
 }
 
 bool getTopCenterKickOut() {
     bool res = bally.getRedge(TOP_CENTER_KICK_OUT_ROW, TOP_CENTER_KICK_OUT_COL);
-    if (res/* && ballInPlay*/) { //STUCK AT BEGINNING
+    if (res) { //STUCK AT BEGINNING
         int score = 0;
 
         if(sinkholeBonus<3) {
@@ -372,7 +370,6 @@ bool getTopCenterKickOut() {
         scores[curPlayer]+=score;
         displayScores(scores, numPlayers);
         if(sinkholeBonus==0) {
-            //bally.setLamp(sinkholeBonuses[2][0], sinkholeBonuses[2][0], false);
             sinkholeBonus++;
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], true);
             Serial.print("if ");
@@ -381,7 +378,6 @@ bool getTopCenterKickOut() {
         else if(sinkholeBonus<3) {
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], false);
             sinkholeBonus++;
-            //sinkholeBonus %= 4;
             bally.setLamp(sinkholeBonuses[sinkholeBonus-1][0], sinkholeBonuses[sinkholeBonus-1][1], true);
             Serial.print("else ");
             Serial.println(sinkholeBonus-1);
@@ -399,11 +395,6 @@ bool getTopCenterKickOut() {
     return res;
 }
 
-/*int rightDropTarget[4][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BOTTOM_COL},
-                             {RIGHT_DROP_TARGET_C_ROW,        RIGHT_DROP_TARGET_C_COL},
-                             {RIGHT_DROP_TARGET_B_ROW,        RIGHT_DROP_TARGET_B_COL},
-                             {RIGHT_DROP_TARGET_A_TOP_ROW,    RIGHT_DROP_TARGET_A_TOP_COL}};*/
-
 int dropTargets[8][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BOTTOM_COL},
                              {RIGHT_DROP_TARGET_C_ROW,        RIGHT_DROP_TARGET_C_COL},
                              {RIGHT_DROP_TARGET_B_ROW,        RIGHT_DROP_TARGET_B_COL},
@@ -412,9 +403,6 @@ int dropTargets[8][2] = {{RIGHT_DROP_TARGET_D_BOTTOM_ROW, RIGHT_DROP_TARGET_D_BO
                              {LEFT_DROP_TARGET_C_ROW,        LEFT_DROP_TARGET_C_COL},
                              {LEFT_DROP_TARGET_B_ROW,        LEFT_DROP_TARGET_B_COL},
                              {LEFT_DROP_TARGET_A_TOP_ROW,    LEFT_DROP_TARGET_A_TOP_COL}};
-
-//bool rightDropTargetsAllDown = false, leftDropTargetsAllDown = false;
-//bool dropTargetsAllDown = false;
 
 
 
@@ -438,10 +426,6 @@ bool getDropTarget() {
         }
     }
 
-
-    /*for (int j = 0; j < 8; ++j) {
-        anyRes |= dropTargetsDown[j];
-    }*/
     if(anyRes) {
         Serial.println("anyRes={");
         for (int k = 0; k < 8; ++k) {
@@ -457,7 +441,6 @@ bool getDropTarget() {
     }
 
     if (allRes && ballInPlay) {
-        //dropTargetsAllDown = true;
         for (int i = 0; i < 8; i++)
             dropTargetsDown[i] = false;
         scores[curPlayer]+=50000;
@@ -488,77 +471,9 @@ bool getDropTarget() {
 }
 
 
-
-/*bool getRightDropTarget() {
-    static bool res[4] = {false, false, false, false};
-    for (int i = 0; i < 4; i++) {
-        bool cur = bally.getRedge(rightDropTarget[i][0], rightDropTarget[i][1]);
-        if(cur && ballInPlay) {
-            res[i] = cur;
-            Serial.print("rightDropTarget ");
-            Serial.print(i);
-            Serial.println(" hit");
-            bally.playSound(3);
-        }
-    }
-    bool anyRes = res[0] || res[1] || res[2] || res[3];
-
-    bool allRes = res[0] && res[1] && res[2] && res[3];
-    if (allRes && ballInPlay) {
-        rightDropTargetsAllDown = true;
-        if(leftDropTargetsAllDown) {
-            for (int i = 0; i < 4; i++)
-                res[i] = false;
-            delay(250);
-            bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, false);
-            bally.playSound(4);
-        }
-    }
-
-
-    return anyRes;
-}*/
-
-
-
-/*int leftDropTarget[4][2] = {{LEFT_DROP_TARGET_D_BOTTOM_ROW, LEFT_DROP_TARGET_D_BOTTOM_COL},
-                            {LEFT_DROP_TARGET_C_ROW,        LEFT_DROP_TARGET_C_COL},
-                            {LEFT_DROP_TARGET_B_ROW,        LEFT_DROP_TARGET_B_COL},
-                            {LEFT_DROP_TARGET_A_TOP_ROW,    LEFT_DROP_TARGET_A_TOP_COL}};*/
-
-
-
-/*bool getLeftDropTarget() {
-    static bool res[4] = {false, false, false, false};
-    for (int i = 0; i < 4; i++) {
-        bool cur = bally.getRedge(leftDropTarget[i][0], leftDropTarget[i][1]);
-        if(cur && ballInPlay) {
-            res[i] = cur;
-            bally.playSound(3);
-        }
-    }
-    bool anyRes = res[0] || res[1] || res[2] || res[3];
-
-
-    bool allRes = res[0] && res[1] && res[2] && res[3];
-    if (allRes && ballInPlay) {
-        leftDropTargetsAllDown = true;
-        if(rightDropTargetsAllDown) {
-            for (int i = 0; i < 4; i++)
-                res[i] = false;
-            delay(250);
-            bally.fireSolenoid(LEFT_DROP_TARGET_RESET, false);
-            bally.playSound(4);
-        }
-    }
-
-
-    return anyRes;
-}*/
-
 bool getDropTargetRebound() {
     bool res = bally.getDebRedge(DROP_TARGET_REBOUND_ROW, DROP_TARGET_REBOUND_COL);
-    if (res  && ballInPlay /*&& (rightDropTargetsAllDown || leftDropTargetsAllDown)*/) {
+    if (res  && ballInPlay) {
         bally.playSound(4);//3 bells
         delay(10);
         bally.fireSolenoid(RIGHT_DROP_TARGET_RESET, true, true);
@@ -567,9 +482,6 @@ bool getDropTargetRebound() {
         delay(100);
         for (int i = 0; i < 8; i++)
             bally.getRedge(dropTargets[i][0], dropTargets[i][1]);
-        /*rightDropTargetsAllDown = false;
-        leftDropTargetsAllDown = false;*/
-        //dropTargetsAllDown = false;
         for (int i = 0; i < 8; i++)
             dropTargetsDown[i] = false;
         whenLit = false;
@@ -622,7 +534,6 @@ void advanceABLaneBonus() {
             bally.setLamp(abLaneBonuses[abLaneBonus][0], abLaneBonuses[abLaneBonus][1], false);
             if(abLaneBonus<6)
                 abLaneBonus++;
-            //abLaneBonus %= 7;
             bally.setLamp(abLaneBonuses[abLaneBonus][0], abLaneBonuses[abLaneBonus][1], true);
 
 
@@ -772,15 +683,7 @@ bool getTopLeftPopBumper() {
     return res;
 }
 
-/*
-void parseDisplay(int dispID, unsigned long score ){
-    for(int digit = 0; digit < 7; digit++){
-        unsigned char c = (unsigned char) (score % ((unsigned long) pow(10, digit)));
-        bally.setDisplay(dispID, digit, c);
-    }
 
-}
-*/
 
 
 
@@ -801,12 +704,6 @@ void setup() {//setup:
     bally.setLamp(GAME_OVER_ROW, GAME_OVER_COL, true);
 }
 
-/*bool getAnyPlayFieldSwitch() {
-    unsigned char res = 0;
-    for (int i = 0; i < N_SWITCH_ROWS; i++)
-        res |= bally.getSwitchRow(i);
-    return res;
-}*/
 
 bool getAnyPlayFieldSwitch() {
     bool res = false;
